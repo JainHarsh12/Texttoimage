@@ -22,7 +22,7 @@ def query_huggingface_api(payload):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+            return render_template('prompt.html')
 
 @app.route('/generate_image', methods=['POST'])
 def generate_image():
@@ -47,5 +47,3 @@ def generate_image():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
