@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImageVerse: Unleash the Imagination</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f0f8ff, #d3e0dc, #a0c4ff, #bdb2ff);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .title-wrapper {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            color: #2d3436;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #00f260, #0575e6);
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            font-size: 3em;
+            color: #ff6f61;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ff9a9e, #fad0c4);
+            -webkit-background-clip: text;  /* Added */
+            -moz-background-clip: text;     /* Added */
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+        .container {
+            background-color: #fff;
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 25px;
+            font-size: 1.5em;
+            margin-top: 20px;
+            border: none;
+            border-radius: 15px;
+            background: #f0f7ff;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            outline: none;
+            color: #2d3436;
+        }
+
+        input[type="text"]:focus {
+            background: #e3f2fd;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+            transform: scale(1.02);
+        }
+
+        button {
+            padding: 15px 60px;
+            font-size: 1.4em;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #43cea2, #185a9d);
+            color: white;
+            margin-top: 25px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title-wrapper">
+        <h2>WELCOME TO...</h2>
+        <h1>ImageVerse: Unleash the Imagination</h1>
+    </div>
+    <div class="container">
+        <form action="/generate_image" method="POST">
+            <input type="text" name="text_prompt" placeholder="Enter your text here" required>
+            <br>
+            <button type="submit">Generate Image</button>
+        </form>
+    </div>
+</body>
+</html>
