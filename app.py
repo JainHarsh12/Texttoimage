@@ -1,51 +1,74 @@
-from flask import Flask, render_template, request, send_file
-import requests
-from io import BytesIO
-from PIL import Image
+from flask import Flask, render_template, request, redirect, url_for, session, flash # type: ignore
+import mysql.connector # type: ignore
+from passlib.hash import sha256_crypt # type: ignore
+import os
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
-# Replace with your Hugging Face API key
-API_URL = "https://api-inference.huggingface.co/models/CompVis/stable-diffusion-v1-4"
-HUGGINGFACE_API_KEY = "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"
+# Database connection
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASS = os.getenv("DB_PASS", "Centralperk2=")  # Replace with your MySQL password
 
-headers = {
-    "Authorization": f"Bearer {HUGGINGFACE_API_KEY}"
-}
+try:
+    db = mysql.connector.connect(
+        host="localhost",
+        user=DB_USER,
+        password=DB_PASS,
+        database="image_gen_app"
+    )
+    cursor = db.cursor()
+    print("Connected to MySQL successfully.")
 
-def query_huggingface_api(payload):
-    response = requests.post(API_URL, headers=headers, json=payload)
-    if response.status_code == 200:
-        return response.content
-    else:
-        raise Exception(f"Failed to get a response. Status code: {response.status_code}")
+except mysql.connector.Error as err:
+    print(f"Error connecting to MySQL: {err}")
+    exit(1)
 
+# Route: Login Page
 @app.route('/')
-def index():
-    return render_template('index.html')
+def login():
+    return render_template('login.html')
 
-@app.route('/generate_image', methods=['POST'])
-def generate_image():
-    text_prompt = request.form['text_prompt']
+# Route: Authenticate User
+@app.route('/login', methods=['POST'])
+def authenticate():
+    username = request.form['username']
+    password = request.form['password']
 
-    # Send request to Hugging Face API
-    payload = {
-        "inputs": text_prompt
-    }
     try:
-        image_bytes = query_huggingface_api(payload)
-        image = Image.open(BytesIO(image_bytes))
-        
-        # Save the image in memory to serve it later
-        img_io = BytesIO()
-        image.save(img_io, 'JPEG', quality=70)
-        img_io.seek(0)
+        cursor.execute("SELECT id, password FROM users WHERE username = %s", (username,))
+        user = cursor.fetchone()
 
-        return send_file(img_io, mimetype='image/jpeg')
-    except Exception as e:
-        return str(e)
+        if user and sha256_crypt.verify(password, user[1]):
+            session['user_id'] = user[0]
+            return redirect(url_for('prompt'))  # Update 'prompt' to the correct route
+        else:
+            flash("Invalid username or password", "danger")
+            return redirect(url_for('login'))
+    except mysql.connector.Error as err:
+        return f"Error: {err}", 500
+
+# Route: Register User
+@app.route('/register', methods=['GET', 'POST'])  # Allow both GET and POST methods
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = sha256_crypt.hash(request.form['password'])
+
+        try:
+            cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
+            db.commit()
+            flash("Registration successful! Please log in.", "success")
+            return redirect(url_for('login'))
+        except mysql.connector.Error as err:
+            flash(f"Error: {err}", "danger")
+            return redirect(url_for('register'))  # Redirect back to register on error
+    return render_template('register.html')  # Render register.html for GET requests
+
+# Add a route for the prompts page (if applicable)
+@app.route('/prompt')
+def prompt():
+    return render_template('prompt.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
